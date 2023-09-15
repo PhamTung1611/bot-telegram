@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, JoinColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class UserEntity {
@@ -6,7 +6,7 @@ export class UserEntity {
     id: string;
 
     @Column()
-    id_user: number
+    id_user: string
 
     @Column()
     user_name: string;
