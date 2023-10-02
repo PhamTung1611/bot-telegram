@@ -31,9 +31,27 @@ export class TransactionService {
     return query;
   }
 
-  async getAmountHistory(limit:number): Promise<TransactionEntity[]>{
+  // async getListHistory(idUser: string) {
+  //   const query = await this.transactionRepository.find();
+  //   // console.log(query);
+  //   // console.log(idUser);
+    
+    
+  //   const filteredData = query.filter(
+  //     (obj) => obj.sourceAccount == idUser || obj.destinationAccount == idUser,
+  //   );
+  //   console.log(666,filteredData);
+    
+  //   return filteredData;
+  // }
+
+  async getAmountHistory(limit:number,id_user:string): Promise<TransactionEntity[]>{
     const query = await this.transactionRepository
       .createQueryBuilder('entity')
+      .where(
+        'entity.sourceAccount = :id_user or entity.destinationAccount = :id_user',
+        { id_user },
+      )
       .orderBy('entity.create_date', 'DESC')
       .limit(limit)
       .getMany();

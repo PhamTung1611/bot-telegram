@@ -242,7 +242,7 @@ export class TelegramBotService {
               await this.cacheManager.del(options.id_user);
               return await msg.reply(`Xin lỗi bạn chỉ có ${listHistory} giao dịch thôi`, this.keyboardMarkup);
             } else {
-              const selectHistory = await this.transactionService.getAmountHistory(amountHistory);
+              const selectHistory = await this.transactionService.getAmountHistory(amountHistory,options.id_user);
               for (const item of selectHistory) {
                 await msg.reply(`Mã giao dịch:\n ${item?.id}\nSố tiền: ${item?.price}\nKiểu: ${item?.type}\nTài khoản nguồn: ${item.sourceAccount}\nTài khoản nhận: ${item.destinationAccount}`);
               }
@@ -326,7 +326,8 @@ export class TelegramBotService {
     const checkIdUser = await this.userService.findOneUser(options.id_user);
 
     const listHistory = await this.transactionService.getListHistory(options.id_user)
-
+    // console.log(listHistory);
+    
     switch (options.data) {
       case 'recharge':
         if (checkIdUser == 'fail') {
@@ -337,56 +338,49 @@ export class TelegramBotService {
             action: 'recharge',
             step: 1,
           }, 15000);
-          await msg.reply(
-            'Bạn muốn nạp bao nhiêu tiền',
-            Markup.forceReply(),
+          await msg.replyWithHTML(
+            'Bạn muốn nạp bao nhiêu tiền'
           );
         } else {
-          await msg.reply(
-            `Bạn đang thực hiện chức năng ${data.action}, Vui lòng đợi hết 15s để thực hiện chức năng khác`,
-          );
+          await this.cacheManager.del(options.id_user);
         }
         break;
       case 'checkMoney':
         if (checkIdUser == 'fail') {
-          return await msg.reply(`Vui lòng gõ '/start' để bắt đầu`);
+          return await msg.replyWithHTML(`Vui lòng gõ '/start' để bắt đầu`);
         }
         const checkMoney = await this.userService.CheckMoney(Number(options.id_user));
-        await msg.reply('Số tiền trong ví của bạn đang là ' + checkMoney + ' Đồng');
-        await msg.reply('Tôi có thể giúp gì tiếp cho bạn', this.keyboardMarkup);
+        await msg.replyWithHTML('Số tiền trong ví của bạn đang là ' + checkMoney + ' Đồng');
+        await msg.replyWithHTML('Tôi có thể giúp gì tiếp cho bạn', this.keyboardMarkup);
         await this.cacheManager.del(options.id_user);
         break;
       case 'withdraw':
         if (!checkIdUser) {
-          return await msg.reply(`Vui lòng gõ '/start' để bắt đầu`);
+          return await msg.replyWithHTML(`Vui lòng gõ '/start' để bắt đầu`);
         }
         if (data.action === '') {
           await this.cacheManager.set(options.id_user, {
             action: 'withdraw',
             step: 1
           }, 15000);
-          await msg.reply('Bạn muốn rút bao nhiêu tiền', Markup.forceReply());
+          await msg.reply('Bạn muốn rút bao nhiêu tiền');
         } else {
-          await msg.reply(
-            `Bạn đang thực hiện chức năng ${data.action}, Vui lòng đợi hết 15s để thực hiện chức năng khác`,
-          );
+          await this.cacheManager.del(options.id_user);
         }
         break;
       case 'transfer':
         if (checkIdUser == 'fail') {
-          return await msg.reply(`Vui lòng gõ '/start' để bắt đầu`);
+          return await msg.replyWithHTML(`Vui lòng gõ '/start' để bắt đầu`);
         }
         if (data.action === '') {
           await this.cacheManager.set(options.id_user, {
             action: 'transfer',
             step: 1
           }, 15000);
-          await msg.reply('Vui lòng nhập đúng username người bạn muốn chuyển', Markup.forceReply());
+          await msg.replyWithHTML('Vui lòng nhập đúng username người bạn muốn chuyển', Markup.forceReply());
         }
         else {
-          await msg.reply(
-            `Bạn đang thực hiện chức năng ${data.action}, Vui lòng đợi hết 15s để thực hiện chức năng khác`,
-          );
+          await this.cacheManager.del(options.id_user);
         }
         break;
       case 'history':
@@ -400,14 +394,14 @@ export class TelegramBotService {
         if (data.action === '') {
           await this.cacheManager.set(options.id_user, {
             action: 'history',
-            step: 1
+            step: 1,
           }, 15000);
 
-          await msg.reply(`Bạn đang có ${listHistory} giao dịch bạn muốn xem bao nhiêu giao dịch?`, Markup.forceReply());
+          await msg.reply(`Bạn đang có ${listHistory} giao dịch bạn muốn xem bao nhiêu giao dịch?`);
+          // console.log(options.id_user);
+          
         } else {
-          await msg.reply(
-            `Bạn đang thực hiện chức năng ${data.action}, Vui lòng đợi hết 15s để thực hiện chức năng khác`,
-          );
+          await this.cacheManager.del(options.id_user);
         }
         break;
       case 'transferId':
@@ -422,9 +416,7 @@ export class TelegramBotService {
           await msg.reply('Vui lòng nhập đúng ID người bạn muốn chuyển', Markup.forceReply());
         }
         else {
-          await msg.reply(
-            `Bạn đang thực hiện chức năng ${data.action}, Vui lòng đợi hết 15s để thực hiện chức năng khác`,
-          );
+        await this.cacheManager.del(options.id_user);
         }
         break;
       case 'information':
