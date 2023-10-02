@@ -24,10 +24,11 @@ export class UsersService {
         if (checkUser && Number(money) > 0) {
 
             const blance = Number(Number(checkUser.blance) - Number(money));
+            const moneyblance = String(blance);
             if(blance <= 0){
                 return 'False';
             }else{
-                await this.userRepository.update(checkUser.id,{blance:blance});
+                await this.userRepository.update(checkUser.id,{blance:moneyblance});
                 return 'true';
             }
         } 
@@ -43,7 +44,8 @@ export class UsersService {
             Number(money) > 0
         ) {
             const blance = Number(Number(checkUser.blance)+Number(money));
-            await this.userRepository.update(checkUser.id,{blance:blance});
+            const moneyblance = String(blance);
+            await this.userRepository.update(checkUser.id,{blance:moneyblance});
             return true;
         } else {
             return false;
@@ -88,7 +90,9 @@ export class UsersService {
         const User = await this.userRepository.findOne({where:{user_name:username}});
         if(User){
             const blance = Number(Number(User.blance)+Number(money));
-            await this.userRepository.update(User.id,{blance:blance});
+            const moneyblance = String(blance);
+
+            await this.userRepository.update(User.id,{blance:moneyblance});
             return true;
         }else{
             return false;
@@ -99,7 +103,9 @@ export class UsersService {
         const User = await this.userRepository.findOne({where:{id_user:id}});
         if(User){
             const blance = Number(Number(User.blance)+Number(money));
-            await this.userRepository.update(User.id,{blance:blance});
+            const moneyblance = String(blance);
+
+            await this.userRepository.update(User.id,{blance:moneyblance});
             return true;
         }else{
             return false;

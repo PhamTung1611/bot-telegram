@@ -12,7 +12,7 @@ export class UserEntity {
     user_name: string;
 
     @Column({ default: 0 })
-    blance: number;
+    blance: string;
 
     @Column('timestamp', { default: () => 'CURRENT_TIMESTAMP' })
     create_date: Date;

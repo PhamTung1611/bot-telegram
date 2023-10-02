@@ -128,13 +128,15 @@ export class TelegramBotService {
       case "withdraw":
         if (data.step === 1) {
           const withdrawMoney = options.text;
-
+          // console.log(withdrawMoney);
+          
           if (!Number(withdrawMoney)) {
             return await msg.reply('Vui lòng thực hiện lại', this.keyboardMarkup);
           } else {
             if (Number(withdrawMoney) && Number(withdrawMoney) > 0) {
               data.money = options.text;
               data.step = 2;
+              
               await this.cacheManager.set(options.id_user, data, 15000);
             }
             if (data.step === 2) {
@@ -144,6 +146,14 @@ export class TelegramBotService {
                 await this.cacheManager.del(options.id_user);
                 return await msg.reply('Số dư tài khoản của bạn không đủ để rút hoặc khi rút tối thiểu ví của bạn phải còn 1 Đồng. Vui lòng thực hiện lại', this.keyboardMarkup);
               } else if (withdrawSuccess == 'true') {
+                const createTransaction = {
+                  price: String(data.money),
+                  type: 'withdraw',
+                  sourceAccount: options.id_user,
+                  destinationAccount: options.id_user
+                }
+    
+                await this.transactionService.createTransaction(createTransaction);
                 const checkMoney = await this.userService.CheckMoney(Number(options.id_user));
                 await msg.reply('Rút tiền thành công tài khoản của bạn hiện còn ' + checkMoney + 'Đồng');
                 await this.cacheManager.del(options.id_user);
